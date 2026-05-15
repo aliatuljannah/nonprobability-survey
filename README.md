@@ -319,3 +319,260 @@ Hasil naive estimation dan weighted estimation menunjukkan perbedaan yang tidak 
 Program Studi Statistika  
 FMIPA Universitas Mataram  
 2026
+
+# Penjelasan Sintaks R
+
+## 1. Memanggil Library
+
+```r
+library(readxl)
+library(psych)
+```
+
+Sintaks di atas digunakan untuk memanggil package yang diperlukan dalam pengolahan data.
+
+* `readxl` digunakan untuk membaca file Excel (`.xlsx`) ke dalam RStudio.
+* `psych` digunakan untuk melakukan analisis statistik, seperti uji validitas dan uji reliabilitas menggunakan Cronbach Alpha.
+
+---
+
+## 2. Membaca Dataset
+
+```r
+data <- read_excel("D:/SEMESTER 4/TEKSAM/data survei kepuasan fasilitas 32 sampel.xlsx")
+```
+
+Sintaks tersebut digunakan untuk mengimpor dataset survei dari file Excel ke dalam objek bernama `data`.
+
+---
+
+## 3. Menampilkan Dataset
+
+```r
+View(data)
+```
+
+Sintaks `View(data)` digunakan untuk menampilkan isi dataset dalam bentuk tabel sehingga memudahkan peneliti dalam melihat data responden.
+
+---
+
+# Uji Validitas dan Reliabilitas
+
+## Uji Validitas
+
+Uji validitas dilakukan untuk mengetahui apakah setiap item pertanyaan pada kuesioner mampu mengukur variabel yang diteliti dengan baik.
+
+Pada penelitian ini, uji validitas dilakukan menggunakan nilai `r.drop` yang dihasilkan dari output package `psych` pada RStudio.
+
+Kriteria pengujian:
+
+* Jika nilai `r.drop > 0,349` maka item pertanyaan dinyatakan valid.
+* Jika nilai `r.drop ≤ 0,349` maka item pertanyaan dinyatakan tidak valid.
+
+Sintaks yang digunakan:
+
+```r
+hasil$item.stats
+```
+
+Sintaks tersebut digunakan untuk menampilkan statistik masing-masing item pertanyaan, termasuk nilai `r.drop`.
+
+Berdasarkan hasil output RStudio, seluruh item pertanyaan memiliki nilai `r.drop` lebih besar dari 0,349 sehingga seluruh item pada kuesioner dinyatakan valid dan dapat digunakan dalam penelitian.
+
+---
+
+## Uji Reliabilitas
+
+## 4. Menghitung Cronbach Alpha
+
+```r
+hasil <- alpha(data)
+```
+
+Sintaks ini digunakan untuk menghitung nilai Cronbach Alpha dari seluruh item pertanyaan pada kuesioner.
+
+Cronbach Alpha digunakan untuk mengetahui tingkat reliabilitas instrumen penelitian.
+
+---
+
+## 5. Menampilkan Statistik Item
+
+```r
+hasil$item.stats
+```
+
+Sintaks ini digunakan untuk melihat statistik masing-masing item pertanyaan pada kuesioner, seperti:
+
+* mean,
+* standar deviasi,
+* korelasi item,
+* dan informasi lainnya yang berkaitan dengan validitas item.
+
+---
+
+## 6. Menampilkan Nilai Reliabilitas
+
+```r
+hasil$total
+```
+
+Sintaks tersebut digunakan untuk menampilkan hasil total uji reliabilitas, termasuk nilai Cronbach Alpha.
+
+Pada penelitian ini diperoleh nilai Cronbach Alpha sebesar:
+
+```r
+0.8353163
+```
+
+Karena nilai Cronbach Alpha > 0,70 maka instrumen penelitian dinyatakan reliabel.
+
+---
+
+# Perhitungan Slovin
+
+## 7. Menentukan Ukuran Sampel dengan Rumus Slovin
+
+```r
+N <- 50
+e <- 0.11
+
+n <- N / (1 + N * e^2)
+n
+```
+
+Keterangan:
+
+* `N` = jumlah populasi
+* `e` = tingkat kesalahan (error)
+* `n` = jumlah sampel minimum
+
+Sintaks tersebut digunakan untuk menghitung jumlah minimum sampel menggunakan rumus Slovin dengan tingkat kesalahan sebesar 11%.
+
+Hasil perhitungan diperoleh:
+
+```r
+31.14546
+```
+
+Sehingga jumlah minimum sampel dibulatkan menjadi 31 responden.
+
+---
+
+# Naive Estimation
+
+## 8. Menghitung Proporsi Naive Estimation
+
+```r
+table(data$Jenis_Kelamin)
+
+prop.table(table(data$Jenis_Kelamin))
+```
+
+Keterangan:
+
+* `table()` digunakan untuk menghitung jumlah frekuensi responden.
+* `prop.table()` digunakan untuk menghitung proporsi atau persentase responden.
+
+Naive estimation digunakan untuk menghitung estimasi langsung berdasarkan data sampel tanpa pembobotan.
+
+Rumus naive estimation:
+
+```math
+\hat{P} = \frac{x}{n}
+```
+
+Keterangan:
+
+* `P̂` = proporsi estimasi
+* `x` = jumlah responden pada kategori tertentu
+* `n` = total responden
+
+---
+
+# Weighted Estimation
+
+## 9. Menentukan Proporsi Populasi dan Sampel
+
+```r
+pop_laki <- 18/50
+pop_perempuan <- 32/50
+
+sampel_laki <- 10/32
+sampel_perempuan <- 22/32
+```
+
+Sintaks tersebut digunakan untuk menentukan proporsi populasi dan proporsi sampel berdasarkan jenis kelamin responden.
+
+---
+
+## 10. Menghitung Bobot (Weighting)
+
+```r
+w_laki <- pop_laki / sampel_laki
+w_perempuan <- pop_perempuan / sampel_perempuan
+
+w_laki
+w_perempuan
+```
+
+Sintaks tersebut digunakan untuk menghitung bobot masing-masing kategori responden.
+
+Rumus weighting:
+
+```math
+w_i = \frac{\text{Proporsi Populasi}}{\text{Proporsi Sampel}}
+```
+
+Hasil weighting:
+
+* Bobot laki-laki ≈ 1.15016
+* Bobot perempuan ≈ 0.93023
+
+---
+
+# Perbandingan Estimasi
+
+## 11. Membuat Tabel Perbandingan
+
+```r
+naive <- c(31.3, 68.8)
+weighted <- c(36, 64)
+
+hasil_estimasi <- data.frame(
+  Jenis_Kelamin = c("Laki-laki", "Perempuan"),
+  Naive_Estimation = naive,
+  Weighted_Estimation = weighted
+)
+
+hasil_estimasi
+```
+
+Sintaks tersebut digunakan untuk membuat tabel perbandingan antara hasil naive estimation dan weighted estimation.
+
+---
+
+# Visualisasi Grafik
+
+## 12. Membuat Grafik Perbandingan
+
+```r
+barplot(
+  rbind(naive, weighted),
+  beside = TRUE,
+  col = c("steelblue", "orange"),
+  names.arg = c("Laki-laki", "Perempuan"),
+  main = "Perbandingan Hasil Estimasi",
+  ylab = "Persentase"
+)
+
+legend(
+  "topright",
+  legend = c("Naive Estimation", "Weighted Estimation"),
+  fill = c("steelblue", "orange")
+)
+```
+
+Sintaks tersebut digunakan untuk membuat grafik batang perbandingan antara naive estimation dan weighted estimation berdasarkan distribusi jenis kelamin responden.
+<img width="717" height="759" alt="image" src="https://github.com/user-attachments/assets/9cc89afc-b151-4179-b54a-b282ca83d8c3" />
+
+Sintaks tersebut digunakan untuk membuat grafik batang perbandingan antara naive estimation dan weighted estimation berdasarkan distribusi jenis kelamin responden.
